@@ -1,84 +1,65 @@
-// =====================================================
-// 🚀 SERVIDOR PRINCIPAL
-// =====================================================
-// Ponto de entrada da aplicação
-// Configura Express e conecta todas as rotas
-// =====================================================
+/*
+    Servidor principal da aplicação
+    Configuração do Express e rotas
+*/
 
-// Carregar variáveis de ambiente PRIMEIRO!
 require('dotenv').config();
 
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// Criar aplicação Express
 const app = express();
 
-// =============================================
-// ⚙️ MIDDLEWARES GLOBAIS
-// =============================================
-
-// Permite receber JSON no body das requisições
+// parse do body em JSON
 app.use(express.json());
 
-// Log simples de requisições (para debug)
+// log das requisições pra debug
 app.use((req, res, next) => {
-    console.log(`📨 ${req.method} ${req.path}`);
+    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.path}`);
     next();
 });
 
-// =============================================
-// 🛣️ ROTAS
-// =============================================
-
-// Rota de teste / boas-vindas
+// rota inicial - mostra os endpoints disponíveis
 app.get('/', (req, res) => {
     res.json({
-        message: '🔐 Sistema de Login com JWT',
-        version: '1.0.0',
-        endpoints: {
-            register: 'POST /auth/register',
+        api: 'Sistema de Login JWT',
+        versao: '1.0.0',
+        rotas: {
+            cadastro: 'POST /auth/register',
             login: 'POST /auth/login',
-            profile: 'GET /profile (precisa de token)',
-            updateProfile: 'PUT /profile (precisa de token)'
+            perfil: 'GET /profile',
+            atualizar: 'PUT /profile'
         }
     });
 });
 
-// Rotas de autenticação (públicas)
+// rotas de autenticação (públicas)
 app.use('/auth', authRoutes);
 
-// Rotas de usuário (protegidas)
+// rotas do usuário (precisam de token)
 app.use('/profile', userRoutes);
 
-// =============================================
-// ❌ TRATAMENTO DE ROTAS NÃO ENCONTRADAS
-// =============================================
+// rota não encontrada
 app.use((req, res) => {
     res.status(404).json({
-        error: 'Rota não encontrada',
-        message: `A rota ${req.method} ${req.path} não existe`
+        erro: 'Rota não encontrada',
+        detalhe: `${req.method} ${req.path} não existe`
     });
 });
 
-// =============================================
-// 🏃 INICIAR SERVIDOR
-// =============================================
+// inicializa o servidor
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log('');
-    console.log('=============================================');
-    console.log('🔐 SISTEMA DE LOGIN COM JWT');
-    console.log('=============================================');
-    console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
-    console.log('');
-    console.log('📍 Endpoints disponíveis:');
-    console.log(`   POST http://localhost:${PORT}/auth/register`);
-    console.log(`   POST http://localhost:${PORT}/auth/login`);
-    console.log(`   GET  http://localhost:${PORT}/profile`);
-    console.log(`   PUT  http://localhost:${PORT}/profile`);
-    console.log('=============================================');
-    console.log('');
+    console.log('\n=================================');
+    console.log('   Sistema de Login JWT');
+    console.log('=================================');
+    console.log(`Servidor online: http://localhost:${PORT}`);
+    console.log('\nRotas:');
+    console.log(`  POST /auth/register`);
+    console.log(`  POST /auth/login`);
+    console.log(`  GET  /profile`);
+    console.log(`  PUT  /profile`);
+    console.log('=================================\n');
 });

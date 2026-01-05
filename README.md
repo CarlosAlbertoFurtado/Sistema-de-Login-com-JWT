@@ -1,120 +1,100 @@
-# Sistema de Autenticação com JWT
+# Sistema de Autenticação JWT
 
-API REST de autenticação desenvolvida em Node.js, implementando JSON Web Tokens para gerenciamento de sessões e bcrypt para criptografia de senhas.
+API de autenticação feita em Node.js usando JWT para controle de sessão e bcrypt para criptografia de senhas.
 
-## Sobre o Projeto
+## Motivação
 
-Este projeto nasceu da minha necessidade de entender profundamente como funcionam os sistemas de autenticação modernos. Desenvolvi esta API do zero, pesquisando as melhores práticas de segurança e implementando cada funcionalidade manualmente para consolidar meu conhecimento em:
+Criei esse projeto pra estudar na prática como funciona autenticação em APIs REST. A ideia foi implementar do zero um sistema de login completo, entendendo cada parte: desde o hash da senha até a validação do token nas rotas protegidas.
 
-- Geração e validação de tokens JWT
-- Hashing seguro de senhas com bcrypt
-- Middleware de proteção de rotas
-- Arquitetura de APIs RESTful
+## Stack
 
-## Tecnologias Utilizadas
+- Node.js
+- Express
+- JWT (jsonwebtoken)
+- bcryptjs
+- dotenv
 
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web
-- **JWT (jsonwebtoken)** - Autenticação via tokens
-- **bcryptjs** - Criptografia de senhas
-- **dotenv** - Variáveis de ambiente
-
-## Instalação
+## Como rodar
 
 ```bash
-# Clone o repositório
-git clone https://github.com/CarlosAlbertoFurtado/Sistema-de-Login-com-JWT.git
-
-# Acesse a pasta
-cd Sistema-de-Login-com-JWT
-
-# Instale as dependências
+# instalar dependências
 npm install
 
-# Configure as variáveis de ambiente
+# configurar variáveis de ambiente
 cp .env.example .env
 
-# Execute o servidor
+# rodar em modo desenvolvimento
 npm run dev
 ```
 
-O servidor estará rodando em `http://localhost:3000`
+Servidor roda em `http://localhost:3000`
 
-## Endpoints da API
+## Rotas
 
-### Autenticação
+### Públicas
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/auth/register` | Cadastro de novo usuário |
-| POST | `/auth/login` | Autenticação e geração de token |
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | /auth/register | Criar conta |
+| POST | /auth/login | Fazer login |
 
-### Usuário (rotas protegidas)
+### Protegidas (precisa de token)
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/profile` | Retorna dados do usuário autenticado |
-| PUT | `/profile` | Atualiza informações do perfil |
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | /profile | Ver perfil |
+| PUT | /profile | Atualizar nome |
 
-## Exemplos de Requisição
+## Exemplos
 
-### Cadastro
+**Cadastro:**
 ```bash
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name": "Carlos", "email": "carlos@email.com", "password": "minhasenha"}'
+  -d '{"name": "Carlos", "email": "carlos@email.com", "password": "123456"}'
 ```
 
-### Login
+**Login:**
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "carlos@email.com", "password": "minhasenha"}'
+  -d '{"email": "carlos@email.com", "password": "123456"}'
 ```
 
-### Acessar Perfil
+**Acessar perfil:**
 ```bash
 curl http://localhost:3000/profile \
-  -H "Authorization: Bearer SEU_TOKEN_AQUI"
+  -H "Authorization: Bearer SEU_TOKEN"
 ```
 
-## Estrutura do Projeto
+## Estrutura
 
 ```
 src/
-├── config/
-│   └── auth.js          # Configurações do JWT
+├── config/auth.js         # config do JWT
 ├── controllers/
-│   ├── authController.js    # Lógica de autenticação
-│   └── userController.js    # Lógica de usuário
-├── database/
-│   └── users.js         # Persistência de dados
-├── middleware/
-│   └── authMiddleware.js    # Validação de tokens
+│   ├── authController.js  # login e registro
+│   └── userController.js  # perfil
+├── database/users.js      # dados em memória
+├── middleware/authMiddleware.js
 ├── routes/
-│   ├── authRoutes.js    # Rotas públicas
-│   └── userRoutes.js    # Rotas protegidas
-└── server.js            # Ponto de entrada
+│   ├── authRoutes.js
+│   └── userRoutes.js
+└── server.js
 ```
 
-## Segurança Implementada
+## Segurança
 
-- Senhas nunca são armazenadas em texto puro (hash bcrypt com salt)
-- Tokens JWT com tempo de expiração configurável
-- Middleware de autenticação em todas as rotas privadas
-- Variáveis sensíveis isoladas em arquivo `.env`
+- Senhas são hasheadas com bcrypt antes de salvar
+- Tokens expiram em 7 dias (configurável)
+- Rotas protegidas validam o token antes de executar
 
-## Melhorias Futuras
+## Próximos passos
 
-- Integração com banco de dados (MongoDB ou PostgreSQL)
-- Implementação de refresh tokens
-- Sistema de recuperação de senha
-- Níveis de permissão (roles)
-
-## Autor
-
-Desenvolvido por **Carlos Alberto Furtado**
+- Conectar com banco de dados real
+- Implementar refresh token
+- Adicionar recuperação de senha
 
 ---
 
-*Este projeto faz parte do meu portfólio de estudos em desenvolvimento backend.*
+Feito por Carlos Alberto Furtado

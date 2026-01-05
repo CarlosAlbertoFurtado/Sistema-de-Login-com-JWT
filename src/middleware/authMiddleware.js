@@ -1,82 +1,63 @@
-// =====================================================
-// 🛡️ MIDDLEWARE DE AUTENTICAÇÃO
-// =====================================================
-// Este middleware protege rotas que precisam de login
-// Ele verifica se o token JWT é válido
-// =====================================================
+/*
+    Middleware de autenticação
+    Verifica se o token JWT é válido
+*/
 
 const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth');
 
-/**
- * Middleware que verifica se o usuário está autenticado
- * Deve ser usado em rotas que precisam de proteção
- */
+
 function authMiddleware(req, res, next) {
-    // 1. Pegar o header Authorization
     const authHeader = req.headers.authorization;
 
-    // 2. Verificar se o header existe
+    // verifica se mandou o header
     if (!authHeader) {
         return res.status(401).json({
-            error: 'Token não fornecido',
-            message: 'Você precisa estar logado para acessar esta rota'
+            erro: 'Token ausente',
+            mensagem: 'Faça login para acessar'
         });
     }
 
-    // =============================================
-    // 📋 FORMATO DO HEADER
-    // =============================================
-    // O token vem no formato: "Bearer <token>"
-    // Precisamos separar e pegar só o token
-    const parts = authHeader.split(' ');
+    // formato esperado: "Bearer <token>"
+    const partes = authHeader.split(' ');
 
-    if (parts.length !== 2) {
+    if (partes.length !== 2) {
         return res.status(401).json({
-            error: 'Erro no token',
-            message: 'Formato do token inválido'
+            erro: 'Token inválido',
+            mensagem: 'Formato incorreto'
         });
     }
 
-    const [scheme, token] = parts;
+    const [tipo, token] = partes;
 
-    // 3. Verificar se começa com "Bearer"
-    if (!/^Bearer$/i.test(scheme)) {
+    // verifica se é Bearer
+    if (!/^Bearer$/i.test(tipo)) {
         return res.status(401).json({
-            error: 'Token mal formatado',
-            message: 'O token deve começar com "Bearer"'
+            erro: 'Token mal formatado',
+            mensagem: 'Use o formato Bearer <token>'
         });
     }
 
-    // =============================================
-    // ✅ VERIFICAR TOKEN JWT
-    // =============================================
+    // valida o token
     try {
-        // jwt.verify decodifica e valida o token
-        // Se o token for inválido ou expirado, lança um erro
-        const decoded = jwt.verify(token, authConfig.secret);
-
-        // 4. Adiciona o ID do usuário ao request
-        // Assim, as próximas funções podem saber quem está logado
-        req.userId = decoded.id;
-
-        // 5. Continua para a próxima função (controller)
+        const dados = jwt.verify(token, authConfig.secret);
+        req.userId = dados.id;
         return next();
 
-    } catch (error) {
-        // Token inválido ou expirado
-        if (error.name === 'TokenExpiredError') {
+    } catch (err) {
+        if (err.name === 'TokenExpiredError') {
             return res.status(401).json({
-                error: 'Token expirado',
-                message: 'Sua sessão expirou. Faça login novamente.'
+                erro: 'Sessão expirada',
+                mensagem: 'Faça login novamente'
             });
         }
 
         return res.status(401).json({
-            error: 'Token inválido',
-            message: 'O token fornecido é inválido'
+            erro: 'Token inválido',
+            mensagem: 'Não foi possível autenticar'
         });
     }
 }
+
 
 module.exports = authMiddleware;

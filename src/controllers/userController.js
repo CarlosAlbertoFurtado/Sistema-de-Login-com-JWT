@@ -1,97 +1,83 @@
-// =====================================================
-// 👤 CONTROLLER DE USUÁRIO
-// =====================================================
-// Contém a lógica das rotas protegidas
-// Essas funções só são acessíveis com token válido!
-// =====================================================
+/*
+    Controller de usuário
+    Funções de perfil (rotas protegidas)
+*/
 
 const usersDB = require('../database/users');
 
-// -----------------------------------------------------
-// 📋 OBTER PERFIL DO USUÁRIO LOGADO
-// -----------------------------------------------------
+
+// retorna os dados do usuário logado
 function getProfile(req, res) {
     try {
-        // O middleware já verificou o token e adicionou o userId
-        const userId = req.userId;
+        const userId = req.userId; // vem do middleware
 
-        // Buscar usuário no banco
-        const user = usersDB.findById(userId);
-
-        if (!user) {
+        const usuario = usersDB.findById(userId);
+        if (!usuario) {
             return res.status(404).json({
-                error: 'Usuário não encontrado',
-                message: 'O usuário não existe mais no sistema'
+                erro: 'Não encontrado',
+                mensagem: 'Usuário não existe'
             });
         }
 
-        // Retornar dados (sem a senha!)
         return res.status(200).json({
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
+            usuario: {
+                id: usuario.id,
+                nome: usuario.name,
+                email: usuario.email,
+                criadoEm: usuario.createdAt,
+                atualizadoEm: usuario.updatedAt
             }
         });
 
-    } catch (error) {
-        console.error('Erro ao buscar perfil:', error);
+    } catch (err) {
+        console.error('Erro ao buscar perfil:', err);
         return res.status(500).json({
-            error: 'Erro interno',
-            message: 'Ocorreu um erro ao buscar o perfil'
+            erro: 'Erro no servidor',
+            mensagem: 'Não foi possível buscar o perfil'
         });
     }
 }
 
-// -----------------------------------------------------
-// ✏️ ATUALIZAR PERFIL DO USUÁRIO
-// -----------------------------------------------------
+
+// atualiza o nome do usuário
 function updateProfile(req, res) {
     try {
         const userId = req.userId;
         const { name } = req.body;
 
-        // Validar dados
         if (!name) {
             return res.status(400).json({
-                error: 'Dados incompletos',
-                message: 'O nome é obrigatório'
+                erro: 'Campo obrigatório',
+                mensagem: 'Informe o nome'
             });
         }
 
-        // Atualizar no banco
-        const updatedUser = usersDB.update(userId, { name });
-
-        if (!updatedUser) {
+        const usuario = usersDB.update(userId, { name });
+        if (!usuario) {
             return res.status(404).json({
-                error: 'Usuário não encontrado',
-                message: 'O usuário não existe mais no sistema'
+                erro: 'Não encontrado',
+                mensagem: 'Usuário não existe'
             });
         }
 
-        // Retornar dados atualizados
         return res.status(200).json({
-            message: 'Perfil atualizado com sucesso!',
-            user: {
-                id: updatedUser.id,
-                name: updatedUser.name,
-                email: updatedUser.email,
-                updatedAt: updatedUser.updatedAt
+            mensagem: 'Perfil atualizado',
+            usuario: {
+                id: usuario.id,
+                nome: usuario.name,
+                email: usuario.email,
+                atualizadoEm: usuario.updatedAt
             }
         });
 
-    } catch (error) {
-        console.error('Erro ao atualizar perfil:', error);
+    } catch (err) {
+        console.error('Erro ao atualizar:', err);
         return res.status(500).json({
-            error: 'Erro interno',
-            message: 'Ocorreu um erro ao atualizar o perfil'
+            erro: 'Erro no servidor',
+            mensagem: 'Não foi possível atualizar'
         });
     }
 }
 
-module.exports = {
-    getProfile,
-    updateProfile
-};
+
+module.exports = { getProfile, updateProfile };

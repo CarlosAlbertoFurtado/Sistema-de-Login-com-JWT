@@ -1,25 +1,20 @@
-// =====================================================
-// 🛣️ ROTAS DE USUÁRIO (PROTEGIDAS)
-// =====================================================
-// Todas estas rotas precisam de token válido!
-// O middleware authMiddleware verifica o token
-// =====================================================
+/*
+    Rotas de usuário
+    Endpoints protegidos (precisam de token)
+*/
 
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// =============================================
-// 🛡️ APLICAR MIDDLEWARE EM TODAS AS ROTAS
-// =============================================
-// Todas as rotas abaixo passarão pelo middleware
+// aplica o middleware em todas as rotas
 router.use(authMiddleware);
 
-// GET /profile - Obter dados do usuário logado
+// buscar perfil
 router.get('/', userController.getProfile);
 
-// PUT /profile - Atualizar dados do usuário
+// atualizar perfil
 router.put('/', userController.updateProfile);
 
 module.exports = router;

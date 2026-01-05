@@ -1,88 +1,57 @@
-// =====================================================
-// 📦 BANCO DE DADOS EM MEMÓRIA
-// =====================================================
-// Em um projeto real, você usaria MongoDB ou PostgreSQL
-// Aqui usamos um array para fins didáticos
-// =====================================================
+/*
+    Banco de dados em memória
+    Simula um banco para fins de estudo
+    Em produção, usar MongoDB ou PostgreSQL
+*/
 
-// Array que simula a tabela de usuários
-const users = [];
+const usuarios = [];
+let proximoId = 1;
 
-// Contador para gerar IDs únicos
-let nextId = 1;
 
-// -----------------------------------------------------
-// FUNÇÕES DO BANCO DE DADOS
-// -----------------------------------------------------
-
-/**
- * Busca um usuário pelo email
- * @param {string} email - Email do usuário
- * @returns {Object|undefined} - Usuário encontrado ou undefined
- */
+// busca por email
 function findByEmail(email) {
-    return users.find(user => user.email === email);
+    return usuarios.find(u => u.email === email);
 }
 
-/**
- * Busca um usuário pelo ID
- * @param {number} id - ID do usuário
- * @returns {Object|undefined} - Usuário encontrado ou undefined
- */
+// busca por id
 function findById(id) {
-    return users.find(user => user.id === id);
+    return usuarios.find(u => u.id === id);
 }
 
-/**
- * Cria um novo usuário no banco
- * @param {Object} userData - Dados do usuário (name, email, password)
- * @returns {Object} - Usuário criado com ID
- */
-function create(userData) {
-    const newUser = {
-        id: nextId++,
-        name: userData.name,
-        email: userData.email,
-        password: userData.password, // Já vem com hash!
+// cria novo usuário
+function create(dados) {
+    const novoUsuario = {
+        id: proximoId++,
+        name: dados.name,
+        email: dados.email,
+        password: dados.password,
         createdAt: new Date().toISOString()
     };
-    
-    users.push(newUser);
-    return newUser;
+
+    usuarios.push(novoUsuario);
+    return novoUsuario;
 }
 
-/**
- * Atualiza os dados de um usuário
- * @param {number} id - ID do usuário
- * @param {Object} updates - Campos a atualizar
- * @returns {Object|null} - Usuário atualizado ou null
- */
-function update(id, updates) {
-    const userIndex = users.findIndex(user => user.id === id);
-    
-    if (userIndex === -1) {
-        return null;
+// atualiza usuário
+function update(id, dados) {
+    const index = usuarios.findIndex(u => u.id === id);
+
+    if (index === -1) return null;
+
+    if (dados.name) {
+        usuarios[index].name = dados.name;
     }
-    
-    // Atualiza apenas os campos permitidos
-    if (updates.name) {
-        users[userIndex].name = updates.name;
-    }
-    
-    users[userIndex].updatedAt = new Date().toISOString();
-    
-    return users[userIndex];
+
+    usuarios[index].updatedAt = new Date().toISOString();
+    return usuarios[index];
 }
 
-/**
- * Lista todos os usuários (para debug)
- * @returns {Array} - Lista de usuários
- */
+// lista todos (debug)
 function findAll() {
-    return users;
+    return usuarios;
 }
 
-// Exporta as funções
+
 module.exports = {
     findByEmail,
     findById,
